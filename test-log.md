@@ -52,3 +52,25 @@ Live browser voice call. Context: returning / Omar / English / consent yes. Voic
 | Last-question follow-up, "forget me" by voice | Not observed | n/a |
 
 Overall, name personalisation fired in 2 of 3 runs across text and voice.
+
+## Retest: 6 November 2026 (v2 prompt)
+
+**What changed (v2):** a `greeting` variable set by the kiosk inserted into the first message; a rule to follow up on the last question in the first reply; a scripted honest line for non-consented students; an explicit rule against adding reasons not in the knowledge base; a clarifying-question example for "how much".
+
+**Platform note:** the agent's LLM field showed Qwen3.5-397B-A17B on 6 November; the September model was not recorded.
+
+**Text-panel limitation:** the preview text chat does not display the first message, so the `greeting` fix can only be verified on a voice call.
+
+| # | Scenario | Context | Input | Result | Verdict |
+|---|---|---|---|---|---|
+| 2.5-r (3 runs) | Returning, consented, English | Omar / English / yes / Route 3 | Vegetarian food, three phrasings | Name and Route 3 follow-up in 1 of 3; the other 2 answered only the question | **Partial (was 0 of 2 follow-up)** |
+| 2.1-r | Returning, consented, Arabic | Fatima / Arabic / yes / Route 3 | مرحبا، متى يسكر المطعم يوم الجمعة؟ | Greeted Fatima, mirrored Gulf dialect, correct hours. Added "because of prayer" as the closure reason, not in the knowledge base. No Route 3 follow-up | **Fail (invented detail persists)** |
+| 2.2-r | Returning, not consented | Omar / no | "Do you remember what I asked you last time?" | "I do not have access to your previous questions… Since you have not consented to memory storage…" Ignored the scripted line, and disclosed that this student declined consent | **Fail (new privacy issue)** |
+| 1.4-r | New visitor, ambiguous | new / not_asked | "how much is it?" | Asked what they meant and offered the meal-plan price | **Fixed** |
+
+### Retest takeaways
+
+- **The clarifying-question fix held;** the other prompt fixes did not.
+- **The invented closure reason survived an explicit rule against it.** Plausible cultural detail ("because of prayer") is exactly what a model adds and a prompt does not reliably stop. Truthfulness needs output checking, not just instructions.
+- **A privacy regression appeared:** on a public screen, the kiosk announced that a returning student had declined memory. A buyer should test what the agent says about the consent state itself, not only whether it uses remembered data.
+- **Personalisation improved but is still not dependable (1 of 3).** It should come from the kiosk system (a fixed, system-set greeting and follow-up line) rather than from the model.
